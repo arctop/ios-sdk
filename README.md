@@ -58,7 +58,7 @@ The SDK contains the following components.
 ### Session Phase
 
 1. [Verify That a User is Logged In](#1-verify-that-a-user-is-logged-in)
-2. [Verify That a User Has Been Calibrated for Arctop](#2-verify-that-a-user-is-calibrated)
+2. [Verify That a User Is Calibrated](#2-verify-that-a-user-is-calibrated)
 3. [Connect to an Arctop Sensor Device](#3-connect-to-an-arctop-sensor-device)
 4. [Verify Signal Quality of Device](#4-verify-signal-quality-of-device)
 5. [Begin a Session](#5-begin-a-session)
@@ -150,7 +150,7 @@ This usually takes around 3 minutes and then the user is ready to proceed. You c
 
 #### 3. Connect to an Arctop Sensor Device 
    
-Connecting to a Arctop sensor device, for example a headband, is accomplished by calling `func connectSensorDevice(deviceId: String) throws`
+Connecting to an Arctop sensor device, for example a headband, is accomplished by calling `func connectSensorDevice(deviceId: String) throws`
     
 To find available devices, you can initiate a scan using `func scanForAvailableDevices() throws`.
 Results will be reported to the SDK Listener via: `func onDeviceListUpdated(headwareDeviceList: [String])`
@@ -198,15 +198,20 @@ You can find the prediction names in `ArctopSDKPredictions`.
 
 At this point, your app will receive results via the `onValueChanged(String key,float value)` callback. 
 
+###### Focus, Enjoyment, and Stress 
 Results are given in the form of values from 0-100 for focus, enjoyment, and stress. The neutral point for each user is at 50, meaning that values above 50 reflect high levels of the measured quantity. For example, a 76 in focus is a high level of focus, while a 99 is nearly the highest focus that can be achieved. Values below 50 represent the opposite, meaning lack of focus or lack of enjoyment or lack of stress. For example, a 32 in focus is a lower level that reflects the user may not be paying much attention, while a 12 in enjoyment can mean the user dislikes the current experience. A value of 23 in stress means that the user is relatively calm. 
 
 Focus and enjoyment are derived exclusively from brain data, while stress is derived from heart rate variability (HRV) data. The relationship between stress outputs (between 0 and 100) and heart rate variability data can be described by an inverted logistic function, in which the stress value of 50 corresponds to an HRV of 60ms. 
 
+###### Blinks
 Eye blink data is derived from brain data and recorded as a binary. The presence of a blink will be indicated by a value of 1 in that column. Blink data for each individual eye will be provided in a future version.
-Sleep onset is also indicated by binary values of 0 or 1 under "sleep detection". This information tells whether a user is detected to be asleep or awake at each timestamp, with the awake state indicated by a 0 and asleep state indicated by a 1. Additional sleep metrics will be provided in a future version. 
 
+###### Sleep 
+Sleep onset is indicated by binary values of 0 or 1 under the _Sleep Detection_ column. This information tells whether a user is detected to be asleep or awake at each timestamp, with the awake state indicated by a 0 and asleep state indicated by a 1. If sleep is detected within an Arctop streaming session, data on enjoyment, focus, and blinks will not be provided. Additional sleep metrics will be included in a future version. 
+
+###### Signal Quality
 Excessively noisy data that cannot be decoded accurately in Arctop’s SDK is represented as -1 or NaN. Values of -1 or NaNs should be ignored as these reflect low confidence periods of analysis. This can occur for many reasons, such as a lapse in sensor connection to the skin. If you notice an excess of -1s or NaNs in your data, please contact Arctop for support as these values typically only occur on a limited basis.
-    
+
 Signal QA is reported via `func onQAStatus(passed:Bool ,type:QAFailureType)` callback. If QA failed during the analysis window, the `passed` parameter will be false, and the type of failure will be reported in `type`.
 
 Valid types are defined as:
@@ -245,6 +250,6 @@ Call `func deinitializeArctop()` to have Arctop release all of its resources.
 
 ## Using the SDK Outside of iOS and Android
 
-Arctop™ provides a LAN webserver that allows clients other than Android and iOS access to the SDK data. For more info see [Stream Server Docs](https://github.com/arctop/android-sdk/blob/main/Arctop-Stream.md).
+Arctop™ provides a LAN webserver that allows clients other than iOS and Android access to the SDK data. For more info see [Stream Server Docs](https://github.com/arctop/android-sdk/blob/main/Arctop-Stream.md).
 
 It is highly recomended to first read through this documentation to have a better understanding of the SDK before trying to work with the stream server.
